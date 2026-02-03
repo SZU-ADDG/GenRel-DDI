@@ -1,0 +1,1 @@
+**The checkpoints for GenRel-DDI are available at :**  <https://drive.google.com/drive/folders/1UIvw8DdNcx8qMu09H4t4oz0EI7Jpw00F?usp=drive_link>

@@ -1,54 +1,71 @@
 # GenRel-DDI
-Rethinking Drug–Drug Interaction Modeling as Generalizable Relation Learning
+**Rethinking Drug–Drug Interaction Modeling as Generalizable Relation Learning**  
+**Paper:** <https://arxiv.org/abs/2601.15771>
+
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-required-EE4C2C?logo=pytorch&logoColor=white)
+![Transformers](https://img.shields.io/badge/Transformers-required-FFD21E?logo=huggingface&logoColor=000)
+
+---
+
+## Contents
+- [Installation](#1-installation)
+- [Data format](#2-data-format)
+- [Training](#3-training)
+- [Evaluation](#4-evaluation)
+- [Configuration (config.py)](#5-configuration-configpy)
+  - [tasks](#51-tasks-datasettask-definitions)
+  - [encoder_specs](#52-encoder_specs-two-encoders-bert--mol)
+  - [local_bert directory layout](#local_bert-directory-layout)
+
+---
 
 ## 1. Installation
 
-Recommended:
-- Python 3.10
-- PyTorch built for your CUDA/driver stack
+### Requirements
+- Python 3.10+
+- PyTorch built for your CUDA / driver environment
 
+### Install dependencies
 Install the minimal Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-Notes:
-- `torch` wheels are CUDA-specific; install it the same way you install PyTorch on your cluster.
-- The remaining packages are pure Python and can be installed via pip.
+### Notes
+- `torch` wheels are CUDA-specific. Install PyTorch using the method you normally use on your cluster or workstation.
+- The remaining packages are installed via pip.
 
 ---
 
 ## 2. Data format
 
-The code expects CSV files with three columns:
+The code expects **CSV** files with **three columns**:
 
-1. drug A (SMILES or any string accepted by the tokenizer)
-2. drug B
-3. label
+1. `drug_a` (SMILES or any string accepted by the tokenizer)
+2. `drug_b`
+3. `label`
 
 ---
 
 ## 3. Training
 
-### 3.1 Default training (run all tasks × all seeds)
-
+### 3.1 Default training (all tasks × all seeds)
 ```bash
 python main.py --mode train
 ```
 
-The training loop iterates:
-- all entries in `config.py -> tasks`
-- all entries in `config.py -> seeds`
+Behavior:
+- iterates over all entries in `config.py -> tasks`
+- iterates over all entries in `config.py -> seeds`
 
 ### 3.2 Train a single task
-
 `--task` is the index in `config.py -> tasks` (starting from 0):
 ```bash
 python main.py --mode train --task 0
 ```
 
 ### 3.3 Train a single seed
-
 ```bash
 python main.py --mode train --task 0 --seed 42
 ```
@@ -58,14 +75,13 @@ python main.py --mode train --task 0 --seed 42
 ## 4. Evaluation
 
 Evaluation is performed for a single task:
-
 ```bash
 python main.py --mode eval --task 0 --ckpt /path/to/checkpoint.pth
 ```
 
 Behavior:
 - uses `task["test_csvs"]` when provided
-- if `test_csvs` is empty, it falls back to `val_csvs`
+- if `test_csvs` is empty, falls back to `val_csvs`
 
 ---
 
@@ -99,16 +115,16 @@ self.tasks = [
 
 ### 5.2 `encoder_specs`: two encoders (bert / mol)
 
-`encoder_specs` must contain exactly two entries:
+`encoder_specs` must contain **exactly two entries**:
 
-- `slot="bert"`: drives the `Anchor Role` inputs
-- `slot="mol"`: drives the `Adapter Role` inputs
+- `slot=bert`: drives the **Anchor Role** inputs
+- `slot=mol`: drives the **Adapter Role** inputs
 
 Common fields:
-- `slot`: `"bert"` or `"mol"`
+- `slot`: `bert` or `mol`
 - `kind`:
-  - `"hf"`: load via `transformers` AutoModel/AutoTokenizer
-  - `"local_bert"`: load your self-pretrained model from a local directory
+  - `hf`: load via `transformers` `AutoModel` / `AutoTokenizer`
+  - `local_bert`: load a self-pretrained model from a local directory
 - `path`: model name or local directory path
 - `freeze`: whether to freeze this encoder during training
 - `max_len`: max token length for this encoder input
@@ -121,7 +137,7 @@ self.encoder_specs = [
 ]
 ```
 
-#### `local_bert` directory requirements
+#### `local_bert` directory layout
 
 The directory specified by `path` should contain:
 - `vocab.txt`
